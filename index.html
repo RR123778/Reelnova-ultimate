@@ -1,0 +1,137 @@
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let scenes = [];
+let index = 0;
+
+// ✅ Generate Script
+function generate(){
+  const prompt = document.getElementById("prompt").value.trim();
+
+  if(!prompt){
+    alert("⚠️ Topic डालो!");
+    return;
+  }
+
+  scenes = [
+    "🔥 " + prompt,
+    "क्या आप जानते हैं " + prompt + "?",
+    prompt + " आपके लिए क्यों जरूरी है",
+    "Top tips follow करो",
+    "Final secret miss मत करना 🔥"
+  ];
+
+  document.getElementById("script").value = scenes.join("\n");
+
+  drawScene(scenes[0]); // first scene show
+}
+
+// 🎥 Preview
+function playVideo(){
+  if(scenes.length === 0){
+    alert("पहले Generate दबाओ!");
+    return;
+  }
+
+  index = 0;
+  nextScene();
+}
+
+function nextScene(){
+  if(index >= scenes.length) return;
+
+  drawScene(scenes[index]);
+
+  index++;
+  setTimeout(nextScene, 2000);
+}
+
+// 🎨 Draw Scene
+function drawScene(text){
+  ctx.fillStyle = "#111";
+  ctx.fillRect(0,0,360,640);
+
+  ctx.fillStyle = "white";
+  ctx.font = "20px Arial";
+
+  wrapText(text,20,200,300,30);
+}
+
+// 📏 Wrap Text
+function wrapText(text,x,y,maxWidth,lineHeight){
+  let words = text.split(" ");
+  let line = "";
+
+  for(let i=0;i<words.length;i++){
+    let testLine = line + words[i] + " ";
+    let w = ctx.measureText(testLine).width;
+
+    if(w > maxWidth){
+      ctx.fillText(line,x,y);
+      line = words[i] + " ";
+      y += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line,x,y);
+}
+
+// 🔊 Voice
+function speakAll(){
+  if(scenes.length === 0){
+    alert("Generate first!");
+    return;
+  }
+
+  let msg = new SpeechSynthesisUtterance(scenes.join(". "));
+  speechSynthesis.speak(msg);
+}
+
+// 🎬 Record
+let recorder, chunks=[];
+
+function record(){
+  if(!canvas.captureStream){
+    alert("Recording not supported");
+    return;
+  }
+
+  let stream = canvas.captureStream(30);
+  recorder = new MediaRecorder(stream);
+
+  chunks = [];
+
+  recorder.ondataavailable = e => chunks.push(e.data);
+
+  recorder.onstop = ()=>{
+    let blob = new Blob(chunks,{type:"video/webm"});
+    window.videoURL = URL.createObjectURL(blob);
+    alert("Recording done!");
+  };
+
+  recorder.start();
+  playVideo();
+
+  setTimeout(()=>recorder.stop(), scenes.length * 2000);
+}
+
+// ⬇ Download
+function download(){
+  if(!window.videoURL){
+    alert("पहले Record करो!");
+    return;
+  }
+
+  let a = document.createElement("a");
+  a.href = window.videoURL;
+  a.download = "video.webm";
+  a.click();
+}
+
+// 📲 Share
+function share(){
+  window.open("https://wa.me/?text=Check this AI tool");
+}
+</script>
