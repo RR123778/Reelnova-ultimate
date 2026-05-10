@@ -1,0 +1,18 @@
+{
+  "name": "reelnova-ultimate-vp2a",
+  "version": "1.0.0",
+  "description": "AI Video Generator - Canvas Based",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx serve .",
+    "start": "npx serve ."
+  },
+  "keywords": [
+    "ai",
+    "video",
+    "generator",
+    "canvas"
+  ],
+  "author": "Ramjee Life Care",
+  "license": "MIT"
+}

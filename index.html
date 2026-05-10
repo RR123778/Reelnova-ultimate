@@ -1,137 +1,298 @@
-<script>
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-
-let scenes = [];
-let index = 0;
-
-// ✅ Generate Script
-function generate(){
-  const prompt = document.getElementById("prompt").value.trim();
-
-  if(!prompt){
-    alert("⚠️ Topic डालो!");
-    return;
-  }
-
-  scenes = [
-    "🔥 " + prompt,
-    "क्या आप जानते हैं " + prompt + "?",
-    prompt + " आपके लिए क्यों जरूरी है",
-    "Top tips follow करो",
-    "Final secret miss मत करना 🔥"
-  ];
-
-  document.getElementById("script").value = scenes.join("\n");
-
-  drawScene(scenes[0]); // first scene show
-}
-
-// 🎥 Preview
-function playVideo(){
-  if(scenes.length === 0){
-    alert("पहले Generate दबाओ!");
-    return;
-  }
-
-  index = 0;
-  nextScene();
-}
-
-function nextScene(){
-  if(index >= scenes.length) return;
-
-  drawScene(scenes[index]);
-
-  index++;
-  setTimeout(nextScene, 2000);
-}
-
-// 🎨 Draw Scene
-function drawScene(text){
-  ctx.fillStyle = "#111";
-  ctx.fillRect(0,0,360,640);
-
-  ctx.fillStyle = "white";
-  ctx.font = "20px Arial";
-
-  wrapText(text,20,200,300,30);
-}
-
-// 📏 Wrap Text
-function wrapText(text,x,y,maxWidth,lineHeight){
-  let words = text.split(" ");
-  let line = "";
-
-  for(let i=0;i<words.length;i++){
-    let testLine = line + words[i] + " ";
-    let w = ctx.measureText(testLine).width;
-
-    if(w > maxWidth){
-      ctx.fillText(line,x,y);
-      line = words[i] + " ";
-      y += lineHeight;
-    } else {
-      line = testLine;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎬 AI Video Generator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-  }
-  ctx.fillText(line,x,y);
-}
 
-// 🔊 Voice
-function speakAll(){
-  if(scenes.length === 0){
-    alert("Generate first!");
-    return;
-  }
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
 
-  let msg = new SpeechSynthesisUtterance(scenes.join(". "));
-  speechSynthesis.speak(msg);
-}
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+      max-width: 900px;
+      width: 100%;
+    }
 
-// 🎬 Record
-let recorder, chunks=[];
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
 
-function record(){
-  if(!canvas.captureStream){
-    alert("Recording not supported");
-    return;
-  }
+    input[type="text"] {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
 
-  let stream = canvas.captureStream(30);
-  recorder = new MediaRecorder(stream);
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 15px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 14px;
+      resize: none;
+      margin-bottom: 15px;
+    }
 
-  chunks = [];
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
 
-  recorder.ondataavailable = e => chunks.push(e.data);
+    button {
+      flex: 1;
+      min-width: 120px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
 
-  recorder.onstop = ()=>{
-    let blob = new Blob(chunks,{type:"video/webm"});
-    window.videoURL = URL.createObjectURL(blob);
-    alert("Recording done!");
-  };
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
 
-  recorder.start();
-  playVideo();
+    .btn-generate {
+      background: #667eea;
+      color: white;
+    }
 
-  setTimeout(()=>recorder.stop(), scenes.length * 2000);
-}
+    .btn-play {
+      background: #f093fb;
+      color: white;
+    }
 
-// ⬇ Download
-function download(){
-  if(!window.videoURL){
-    alert("पहले Record करो!");
-    return;
-  }
+    .btn-speak {
+      background: #4facfe;
+      color: white;
+    }
 
-  let a = document.createElement("a");
-  a.href = window.videoURL;
-  a.download = "video.webm";
-  a.click();
-}
+    .btn-record {
+      background: #fa709a;
+      color: white;
+    }
 
-// 📲 Share
-function share(){
-  window.open("https://wa.me/?text=Check this AI tool");
-}
-</script>
+    .btn-download {
+      background: #30cfd0;
+      color: white;
+    }
+
+    .btn-share {
+      background: #a8edea;
+      color: #333;
+    }
+
+    canvas {
+      display: block;
+      margin: 0 auto;
+      background: #111;
+      border-radius: 10px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #666;
+      font-size: 14px;
+    }
+  </style>
+  <!-- Vercel Speed Insights -->
+  <script>
+    window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/speed-insights/script.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>🎬 AI Video Generator</h1>
+    
+    <input type="text" id="prompt" placeholder="Enter your topic (e.g., How to earn money online)">
+    
+    <div class="btn-group">
+      <button class="btn-generate" onclick="generate()">✍️ Generate Script</button>
+    </div>
+    
+    <textarea id="script" placeholder="Generated script will appear here..." readonly></textarea>
+    
+    <canvas id="canvas" width="360" height="640"></canvas>
+    
+    <div class="btn-group" style="margin-top: 20px;">
+      <button class="btn-play" onclick="playVideo()">🎥 Preview</button>
+      <button class="btn-speak" onclick="speakAll()">🔊 Voice</button>
+      <button class="btn-record" onclick="record()">⏺️ Record</button>
+      <button class="btn-download" onclick="download()">📥 Download</button>
+      <button class="btn-share" onclick="share()">📲 Share</button>
+    </div>
+    
+    <div class="footer">
+      <p>Created with ❤️ | Ramjee Life Care</p>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    let scenes = [];
+    let index = 0;
+
+    // ✅ Generate Script
+    function generate(){
+      const prompt = document.getElementById("prompt").value.trim();
+
+      if(!prompt){
+        alert("⚠️ Topic डालो!");
+        return;
+      }
+
+      scenes = [
+        "🔥 " + prompt,
+        "क्या आप जानते हैं " + prompt + "?",
+        prompt + " आपके लिए क्यों जरूरी है",
+        "Top tips follow करो",
+        "Final secret miss मत करना 🔥"
+      ];
+
+      document.getElementById("script").value = scenes.join("\n");
+
+      drawScene(scenes[0]); // first scene show
+    }
+
+    // 🎥 Preview
+    function playVideo(){
+      if(scenes.length === 0){
+        alert("पहले Generate दबाओ!");
+        return;
+      }
+
+      index = 0;
+      nextScene();
+    }
+
+    function nextScene(){
+      if(index >= scenes.length) return;
+
+      drawScene(scenes[index]);
+
+      index++;
+      setTimeout(nextScene, 2000);
+    }
+
+    // 🎨 Draw Scene
+    function drawScene(text){
+      ctx.fillStyle = "#111";
+      ctx.fillRect(0,0,360,640);
+
+      ctx.fillStyle = "white";
+      ctx.font = "20px Arial";
+
+      wrapText(text,20,200,300,30);
+    }
+
+    // 📏 Wrap Text
+    function wrapText(text,x,y,maxWidth,lineHeight){
+      let words = text.split(" ");
+      let line = "";
+
+      for(let i=0;i<words.length;i++){
+        let testLine = line + words[i] + " ";
+        let w = ctx.measureText(testLine).width;
+
+        if(w > maxWidth){
+          ctx.fillText(line,x,y);
+          line = words[i] + " ";
+          y += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line,x,y);
+    }
+
+    // 🔊 Voice
+    function speakAll(){
+      if(scenes.length === 0){
+        alert("Generate first!");
+        return;
+      }
+
+      let msg = new SpeechSynthesisUtterance(scenes.join(". "));
+      speechSynthesis.speak(msg);
+    }
+
+    // 🎬 Record
+    let recorder, chunks=[];
+
+    function record(){
+      if(!canvas.captureStream){
+        alert("Recording not supported");
+        return;
+      }
+
+      let stream = canvas.captureStream(30);
+      recorder = new MediaRecorder(stream);
+
+      chunks = [];
+
+      recorder.ondataavailable = e => chunks.push(e.data);
+
+      recorder.onstop = ()=>{
+        let blob = new Blob(chunks,{type:"video/webm"});
+        window.videoURL = URL.createObjectURL(blob);
+        alert("Recording done!");
+      };
+
+      recorder.start();
+      playVideo();
+
+      setTimeout(()=>recorder.stop(), scenes.length * 2000);
+    }
+
+    // ⬇ Download
+    function download(){
+      if(!window.videoURL){
+        alert("पहले Record करो!");
+        return;
+      }
+
+      let a = document.createElement("a");
+      a.href = window.videoURL;
+      a.download = "video.webm";
+      a.click();
+    }
+
+    // 📲 Share
+    function share(){
+      window.open("https://wa.me/?text=Check this AI tool");
+    }
+  </script>
+</body>
+</html>
