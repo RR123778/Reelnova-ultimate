@@ -1,3 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ReelNova AI PRO</title>
+
+<style>
+body{
+  font-family:Arial;
+  background:#0f172a;
+  color:white;
+  text-align:center;
+  margin:0;
+}
+
+header{
+  background:#ff4081;
+  padding:15px;
+  font-size:20px;
+  font-weight:bold;
+}
+
+.container{
+  padding:15px;
+}
+
+input, textarea{
+  width:90%;
+  padding:10px;
+  margin:10px 0;
+  border:none;
+  border-radius:8px;
+}
+
+button{
+  padding:10px 15px;
+  margin:5px;
+  border:none;
+  border-radius:8px;
+  background:#ff4081;
+  color:white;
+  cursor:pointer;
+}
+
+canvas{
+  margin-top:15px;
+  border-radius:10px;
+  background:black;
+}
+</style>
+</head>
+
+<body>
+
+<header>🔥 ReelNova AI PRO</header>
+
+<div class="container">
+
+<input id="prompt" placeholder="Enter topic...">
+
+<br>
+
+<button onclick="generate()">Generate</button>
+<button onclick="playVideo()">Preview</button>
+<button onclick="speakAll()">Voice</button>
+<button onclick="record()">Record</button>
+<button onclick="download()">Download</button>
+
+<br>
+
+<textarea id="script" rows="6" placeholder="Script will appear here..."></textarea>
+
+<canvas id="canvas" width="360" height="640"></canvas>
+
+</div>
+
 <script>
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -5,12 +81,12 @@ const ctx = canvas.getContext("2d");
 let scenes = [];
 let index = 0;
 
-// ✅ Generate Script
+// 🔥 Generate Script
 function generate(){
   const prompt = document.getElementById("prompt").value.trim();
 
   if(!prompt){
-    alert("⚠️ Topic डालो!");
+    alert("⚠️ Enter topic!");
     return;
   }
 
@@ -24,13 +100,13 @@ function generate(){
 
   document.getElementById("script").value = scenes.join("\n");
 
-  drawScene(scenes[0]); // first scene show
+  drawScene(scenes[0]);
 }
 
 // 🎥 Preview
 function playVideo(){
   if(scenes.length === 0){
-    alert("पहले Generate दबाओ!");
+    alert("Generate first!");
     return;
   }
 
@@ -49,13 +125,13 @@ function nextScene(){
 
 // 🎨 Draw Scene
 function drawScene(text){
-  ctx.fillStyle = "#111";
+  ctx.fillStyle = "#000";
   ctx.fillRect(0,0,360,640);
 
   ctx.fillStyle = "white";
-  ctx.font = "20px Arial";
+  ctx.font = "22px Arial";
 
-  wrapText(text,20,200,300,30);
+  wrapText(text,20,250,300,30);
 }
 
 // 📏 Wrap Text
@@ -94,7 +170,7 @@ let recorder, chunks=[];
 
 function record(){
   if(!canvas.captureStream){
-    alert("Recording not supported");
+    alert("Recording not supported in your browser");
     return;
   }
 
@@ -120,7 +196,7 @@ function record(){
 // ⬇ Download
 function download(){
   if(!window.videoURL){
-    alert("पहले Record करो!");
+    alert("Record first!");
     return;
   }
 
@@ -130,8 +206,7 @@ function download(){
   a.click();
 }
 
-// 📲 Share
-function share(){
-  window.open("https://wa.me/?text=Check this AI tool");
-}
 </script>
+
+</body>
+</html>
