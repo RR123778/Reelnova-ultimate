@@ -2,208 +2,225 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ReelNova AI PRO</title>
+<title>ReelNova AI FINAL 💰🤖</title>
 
 <style>
 body{
+  margin:0;
   font-family:Arial;
-  background:#0f172a;
+  background:#020617;
   color:white;
   text-align:center;
-  margin:0;
 }
-
 header{
-  background:#ff4081;
+  background:linear-gradient(45deg,#6366f1,#22c55e);
   padding:15px;
   font-size:20px;
   font-weight:bold;
 }
-
-.container{
-  padding:15px;
-}
-
 input, textarea{
   width:90%;
   padding:10px;
-  margin:10px 0;
+  margin:8px;
   border:none;
   border-radius:8px;
 }
-
 button{
-  padding:10px 15px;
+  padding:10px;
   margin:5px;
   border:none;
   border-radius:8px;
-  background:#ff4081;
+  background:#6366f1;
   color:white;
-  cursor:pointer;
+  font-weight:bold;
 }
-
 canvas{
-  margin-top:15px;
-  border-radius:10px;
-  background:black;
+  margin-top:10px;
+  width:90%;
+  max-width:360px;
 }
 </style>
 </head>
 
 <body>
 
-<header>🔥 ReelNova AI PRO</header>
+<header>🔥 ReelNova AI FINAL</header>
 
-<div class="container">
-
-<input id="prompt" placeholder="Enter topic...">
+<input id="product" placeholder="Product Name">
+<input id="price" placeholder="Price ₹">
+<input id="image" placeholder="Image URL">
+<input id="phone" placeholder="WhatsApp Number">
+<input id="apikey" placeholder="(Optional) OpenAI API Key">
 
 <br>
 
-<button onclick="generate()">Generate</button>
+<button onclick="generate()">Generate AI Script</button>
 <button onclick="playVideo()">Preview</button>
-<button onclick="speakAll()">Voice</button>
 <button onclick="record()">Record</button>
 <button onclick="download()">Download</button>
+<button onclick="send()">Sell on WhatsApp</button>
 
-<br>
+<textarea id="script" rows="6"></textarea>
 
-<textarea id="script" rows="6" placeholder="Script will appear here..."></textarea>
-
-<canvas id="canvas" width="360" height="640"></canvas>
-
-</div>
+<canvas id="canvas" width="720" height="1280"></canvas>
 
 <script>
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-let scenes = [];
-let index = 0;
+let scenes=[], index=0;
+let img = new Image();
 
-// 🔥 Generate Script
-function generate(){
-  const prompt = document.getElementById("prompt").value.trim();
+// 🤖 AI Script Generate
+async function generate(){
 
-  if(!prompt){
-    alert("⚠️ Enter topic!");
+  let p = product.value;
+  let pr = price.value;
+  let ph = phone.value;
+  let api = apikey.value;
+
+  if(!p || !pr || !ph){
+    alert("Fill all fields");
     return;
   }
 
+  // 🔥 REAL AI (if API available)
+  if(api){
+    try{
+      let res = await fetch("https://api.openai.com/v1/chat/completions",{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          "Authorization":"Bearer " + api
+        },
+        body:JSON.stringify({
+          model:"gpt-4o-mini",
+          messages:[{
+            role:"user",
+            content:`Create 5 short selling lines for ${p} price ${pr} in Hinglish with strong CTA`
+          }]
+        })
+      });
+
+      let data = await res.json();
+      scenes = data.choices[0].message.content.split("\n");
+
+    }catch(e){
+      alert("API error, switching to smart AI");
+      smartAI();
+    }
+  } else {
+    smartAI();
+  }
+
+  script.value = scenes.join("\n");
+
+  img.src = image.value;
+  img.onload = ()=> drawScene(scenes[0]);
+}
+
+// 🧠 Smart Offline AI
+function smartAI(){
   scenes = [
-    "🔥 " + prompt,
-    "क्या आप जानते हैं " + prompt + "?",
-    prompt + " आपके लिए क्यों जरूरी है",
-    "Top tips follow करो",
-    "Final secret miss मत करना 🔥"
+    "🔥 " + product.value,
+    "क्या आप सस्ता और best product ढूंढ रहे हैं?",
+    "अब मिलेगा सिर्फ ₹" + price.value,
+    "Limited stock 🚀 जल्दी करें",
+    "Order WhatsApp 👉 " + phone.value
   ];
-
-  document.getElementById("script").value = scenes.join("\n");
-
-  drawScene(scenes[0]);
 }
 
 // 🎥 Preview
 function playVideo(){
-  if(scenes.length === 0){
-    alert("Generate first!");
-    return;
+  index=0;
+  next();
+}
+
+function next(){
+  if(index>=scenes.length) return;
+  drawScene(scenes[index]);
+  index++;
+  setTimeout(next,2500);
+}
+
+// 🎨 Draw
+function drawScene(text){
+
+  let g = ctx.createLinearGradient(0,0,720,1280);
+  g.addColorStop(0,"#000");
+  g.addColorStop(1,"#1e293b");
+
+  ctx.fillStyle=g;
+  ctx.fillRect(0,0,720,1280);
+
+  if(img.src){
+    ctx.drawImage(img,110,150,500,350);
   }
 
-  index = 0;
-  nextScene();
+  ctx.fillStyle="#fff";
+  ctx.font="bold 46px Arial";
+
+  wrap(text,60,650,600,60);
 }
 
-function nextScene(){
-  if(index >= scenes.length) return;
-
-  drawScene(scenes[index]);
-
-  index++;
-  setTimeout(nextScene, 2000);
-}
-
-// 🎨 Draw Scene
-function drawScene(text){
-  ctx.fillStyle = "#000";
-  ctx.fillRect(0,0,360,640);
-
-  ctx.fillStyle = "white";
-  ctx.font = "22px Arial";
-
-  wrapText(text,20,250,300,30);
-}
-
-// 📏 Wrap Text
-function wrapText(text,x,y,maxWidth,lineHeight){
-  let words = text.split(" ");
-  let line = "";
-
-  for(let i=0;i<words.length;i++){
-    let testLine = line + words[i] + " ";
-    let w = ctx.measureText(testLine).width;
-
-    if(w > maxWidth){
+// 📏 Wrap
+function wrap(t,x,y,m,l){
+  let w=t.split(" "), line="";
+  for(let i=0;i<w.length;i++){
+    let test=line+w[i]+" ";
+    if(ctx.measureText(test).width>m){
       ctx.fillText(line,x,y);
-      line = words[i] + " ";
-      y += lineHeight;
-    } else {
-      line = testLine;
-    }
+      line=w[i]+" ";
+      y+=l;
+    } else line=test;
   }
   ctx.fillText(line,x,y);
 }
 
-// 🔊 Voice
-function speakAll(){
-  if(scenes.length === 0){
-    alert("Generate first!");
-    return;
-  }
-
-  let msg = new SpeechSynthesisUtterance(scenes.join(". "));
-  speechSynthesis.speak(msg);
-}
-
 // 🎬 Record
-let recorder, chunks=[];
-
+let rec,chunks=[];
 function record(){
+
   if(!canvas.captureStream){
-    alert("Recording not supported in your browser");
+    alert("Use Chrome Desktop");
     return;
   }
 
   let stream = canvas.captureStream(30);
-  recorder = new MediaRecorder(stream);
+  rec = new MediaRecorder(stream);
 
-  chunks = [];
+  chunks=[];
 
-  recorder.ondataavailable = e => chunks.push(e.data);
+  rec.ondataavailable=e=>chunks.push(e.data);
 
-  recorder.onstop = ()=>{
-    let blob = new Blob(chunks,{type:"video/webm"});
-    window.videoURL = URL.createObjectURL(blob);
-    alert("Recording done!");
+  rec.onstop=()=>{
+    let blob=new Blob(chunks,{type:"video/webm"});
+    window.videoURL=URL.createObjectURL(blob);
+    alert("Video Ready!");
   };
 
-  recorder.start();
+  rec.start();
   playVideo();
 
-  setTimeout(()=>recorder.stop(), scenes.length * 2000);
+  setTimeout(()=>rec.stop(), scenes.length*2500);
 }
 
 // ⬇ Download
 function download(){
-  if(!window.videoURL){
-    alert("Record first!");
+  if(!videoURL){
+    alert("Record first");
     return;
   }
-
-  let a = document.createElement("a");
-  a.href = window.videoURL;
-  a.download = "video.webm";
+  let a=document.createElement("a");
+  a.href=videoURL;
+  a.download="reel.webm";
   a.click();
+}
+
+// 📲 WhatsApp Sell
+function send(){
+  let msg = script.value;
+  window.open("https://wa.me/?text="+encodeURIComponent(msg));
 }
 
 </script>
