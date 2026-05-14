@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ReelNova AI FINAL 💰🤖</title>
+<title>Ultra PRO AI Reel System</title>
 
 <style>
 body{
@@ -13,15 +13,15 @@ body{
   text-align:center;
 }
 header{
-  background:linear-gradient(45deg,#6366f1,#22c55e);
+  background:linear-gradient(45deg,#ff4d4d,#22c55e);
   padding:15px;
   font-size:20px;
   font-weight:bold;
 }
-input, textarea{
+input, textarea, select{
   width:90%;
   padding:10px;
-  margin:8px;
+  margin:6px;
   border:none;
   border-radius:8px;
 }
@@ -30,12 +30,11 @@ button{
   margin:5px;
   border:none;
   border-radius:8px;
-  background:#6366f1;
+  background:#22c55e;
   color:white;
   font-weight:bold;
 }
 canvas{
-  margin-top:10px;
   width:90%;
   max-width:360px;
 }
@@ -44,21 +43,28 @@ canvas{
 
 <body>
 
-<header>🔥 ReelNova AI FINAL</header>
+<header>🔥 Ultra PRO AI Reel System</header>
 
-<input id="product" placeholder="Product Name">
-<input id="price" placeholder="Price ₹">
+<select id="type">
+<option value="product">🛒 Product Selling</option>
+<option value="motivation">💪 Motivation</option>
+<option value="offer">⚡ Offer</option>
+<option value="story">📖 Story</option>
+<option value="festival">🎉 Festival</option>
+<option value="custom">✍️ Custom</option>
+</select>
+
+<input id="product" placeholder="Product / Topic">
+<input id="price" placeholder="Price / Detail">
 <input id="image" placeholder="Image URL">
 <input id="phone" placeholder="WhatsApp Number">
-<input id="apikey" placeholder="(Optional) OpenAI API Key">
 
-<br>
-
-<button onclick="generate()">Generate AI Script</button>
-<button onclick="playVideo()">Preview</button>
-<button onclick="record()">Record</button>
-<button onclick="download()">Download</button>
-<button onclick="send()">Sell on WhatsApp</button>
+<button onclick="generate()">🎬 Generate</button>
+<button onclick="play()">▶ Preview</button>
+<button onclick="record()">🎥 Record</button>
+<button onclick="download()">⬇ Download</button>
+<button onclick="voice()">🎤 Voice</button>
+<button onclick="share()">📲 WhatsApp Sell</button>
 
 <textarea id="script" rows="6"></textarea>
 
@@ -68,83 +74,102 @@ canvas{
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-let scenes=[], index=0;
+let scenes=[], index=0, alpha=0;
 let img = new Image();
+let bgm = new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
 
-// 🤖 AI Script Generate
-async function generate(){
+// 🎬 SCRIPT AI
+function generate(){
 
+  let t = type.value;
   let p = product.value;
   let pr = price.value;
-  let ph = phone.value;
-  let api = apikey.value;
 
-  if(!p || !pr || !ph){
-    alert("Fill all fields");
-    return;
+  if(t=="product"){
+    scenes = [
+      "🔥 आज का सबसे वायरल प्रोडक्ट!",
+      p + " जिसे लोग बार-बार खरीद रहे हैं 😍",
+      "सिर्फ ₹" + pr + " में शानदार ऑफर 💥",
+      "जल्दी करें स्टॉक खत्म हो रहा है ⚠️",
+      "अभी WhatsApp करें 👉 " + phone.value
+    ];
   }
 
-  // 🔥 REAL AI (if API available)
-  if(api){
-    try{
-      let res = await fetch("https://api.openai.com/v1/chat/completions",{
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json",
-          "Authorization":"Bearer " + api
-        },
-        body:JSON.stringify({
-          model:"gpt-4o-mini",
-          messages:[{
-            role:"user",
-            content:`Create 5 short selling lines for ${p} price ${pr} in Hinglish with strong CTA`
-          }]
-        })
-      });
+  else if(t=="motivation"){
+    scenes = [
+      "💪 जिंदगी बदलनी है?",
+      "तो अभी मेहनत शुरू करो 🔥",
+      "कोई साथ दे या ना दे ❌",
+      "तुम खुद को आगे बढ़ाओ 🚀",
+      "आज से शुरू करो!"
+    ];
+  }
 
-      let data = await res.json();
-      scenes = data.choices[0].message.content.split("\n");
+  else if(t=="offer"){
+    scenes = [
+      "⚡ धमाकेदार ऑफर!",
+      p + " पर भारी छूट 💥",
+      "सिर्फ ₹" + pr,
+      "आज आखिरी मौका 😱",
+      "Order Now 👉 " + phone.value
+    ];
+  }
 
-    }catch(e){
-      alert("API error, switching to smart AI");
-      smartAI();
-    }
-  } else {
-    smartAI();
+  else if(t=="story"){
+    scenes = [
+      "एक लड़का था...",
+      "सब उसे कमजोर समझते थे 😢",
+      "लेकिन उसने हार नहीं मानी 💪",
+      "आज वही सबसे आगे है 🔥",
+      "आप भी कर सकते हैं!"
+    ];
+  }
+
+  else if(t=="festival"){
+    scenes = [
+      "🎉 त्योहार स्पेशल ऑफर!",
+      p + " आपके परिवार के लिए 🎁",
+      "खास कीमत ₹" + pr,
+      "खुशियां बांटे ❤️",
+      "अभी खरीदें!"
+    ];
+  }
+
+  else{
+    scenes = script.value.split("\n");
   }
 
   script.value = scenes.join("\n");
-
   img.src = image.value;
-  img.onload = ()=> drawScene(scenes[0]);
 }
 
-// 🧠 Smart Offline AI
-function smartAI(){
-  scenes = [
-    "🔥 " + product.value,
-    "क्या आप सस्ता और best product ढूंढ रहे हैं?",
-    "अब मिलेगा सिर्फ ₹" + price.value,
-    "Limited stock 🚀 जल्दी करें",
-    "Order WhatsApp 👉 " + phone.value
-  ];
-}
-
-// 🎥 Preview
-function playVideo(){
+// ▶ PLAY
+function play(){
   index=0;
+  bgm.play();
   next();
 }
 
 function next(){
   if(index>=scenes.length) return;
-  drawScene(scenes[index]);
+  alpha=0;
+  animate(scenes[index]);
   index++;
   setTimeout(next,2500);
 }
 
-// 🎨 Draw
-function drawScene(text){
+// 🎥 ANIMATION
+function animate(text){
+  draw(text);
+  if(alpha<1){
+    alpha+=0.05;
+    requestAnimationFrame(()=>animate(text));
+  }
+}
+
+function draw(text){
+
+  ctx.clearRect(0,0,720,1280);
 
   let g = ctx.createLinearGradient(0,0,720,1280);
   g.addColorStop(0,"#000");
@@ -153,17 +178,21 @@ function drawScene(text){
   ctx.fillStyle=g;
   ctx.fillRect(0,0,720,1280);
 
+  ctx.globalAlpha = alpha;
+
   if(img.src){
     ctx.drawImage(img,110,150,500,350);
   }
 
   ctx.fillStyle="#fff";
-  ctx.font="bold 46px Arial";
+  ctx.font="bold 50px Arial";
 
   wrap(text,60,650,600,60);
+
+  ctx.globalAlpha = 1;
 }
 
-// 📏 Wrap
+// ✍️ WRAP
 function wrap(t,x,y,m,l){
   let w=t.split(" "), line="";
   for(let i=0;i<w.length;i++){
@@ -177,52 +206,54 @@ function wrap(t,x,y,m,l){
   ctx.fillText(line,x,y);
 }
 
-// 🎬 Record
-let rec,chunks=[];
+// 🎤 VOICE
+function voice(){
+  let msg = new SpeechSynthesisUtterance(scenes.join(" "));
+  msg.lang = "hi-IN";
+  speechSynthesis.speak(msg);
+}
+
+// 🎥 RECORD
+let rec, chunks=[], videoURL;
+
 function record(){
-
-  if(!canvas.captureStream){
-    alert("Use Chrome Desktop");
-    return;
-  }
-
   let stream = canvas.captureStream(30);
   rec = new MediaRecorder(stream);
-
   chunks=[];
 
   rec.ondataavailable=e=>chunks.push(e.data);
 
   rec.onstop=()=>{
     let blob=new Blob(chunks,{type:"video/webm"});
-    window.videoURL=URL.createObjectURL(blob);
-    alert("Video Ready!");
+    videoURL=URL.createObjectURL(blob);
+    alert("वीडियो तैयार!");
   };
 
   rec.start();
-  playVideo();
+  play();
 
   setTimeout(()=>rec.stop(), scenes.length*2500);
 }
 
-// ⬇ Download
+// ⬇ DOWNLOAD
 function download(){
   if(!videoURL){
-    alert("Record first");
+    alert("पहले रिकॉर्ड करें");
     return;
   }
   let a=document.createElement("a");
   a.href=videoURL;
-  a.download="reel.webm";
+  a.download="reel.mp4";
   a.click();
 }
 
-// 📲 WhatsApp Sell
-function send(){
-  let msg = script.value;
-  window.open("https://wa.me/?text="+encodeURIComponent(msg));
-}
+// 📲 WHATSAPP SELL
+function share(){
+  let caption = script.value + 
+  "\n🔥 Best Deal\n#viral #offer #shopping";
 
+  window.open("https://wa.me/?text="+encodeURIComponent(caption));
+}
 </script>
 
 </body>
