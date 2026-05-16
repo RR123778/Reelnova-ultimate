@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ultra PRO AI Reel System</title>
+<title>AI Reel Auto Selling App</title>
 
 <style>
 body{
@@ -12,159 +12,140 @@ body{
   color:white;
   text-align:center;
 }
+
 header{
-  background:linear-gradient(45deg,#ff4d4d,#22c55e);
+  background:linear-gradient(45deg,#6366f1,#22c55e);
   padding:15px;
   font-size:20px;
   font-weight:bold;
 }
-input, textarea, select{
-  width:90%;
-  padding:10px;
-  margin:6px;
-  border:none;
-  border-radius:8px;
+
+.container{
+  padding:15px;
 }
+
+.card{
+  background:#0f172a;
+  padding:15px;
+  margin:10px;
+  border-radius:15px;
+  box-shadow:0 0 15px rgba(0,0,0,0.5);
+}
+
+input, textarea{
+  width:95%;
+  padding:12px;
+  margin:8px 0;
+  border:none;
+  border-radius:10px;
+  font-size:15px;
+}
+
 button{
-  padding:10px;
-  margin:5px;
-  border:none;
-  border-radius:8px;
-  background:#22c55e;
-  color:white;
-  font-weight:bold;
-}
-canvas{
   width:90%;
-  max-width:360px;
+  padding:12px;
+  margin:8px;
+  border:none;
+  border-radius:10px;
+  font-weight:bold;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.generate{ background:#6366f1; color:white; }
+.preview{ background:#f59e0b; color:black; }
+.sell{ background:#22c55e; color:white; }
+.voice{ background:#ec4899; color:white; }
+
+canvas{
+  width:100%;
+  max-width:350px;
+  border-radius:15px;
 }
 </style>
 </head>
 
 <body>
 
-<header>🔥 Ultra PRO AI Reel System</header>
+<header>🔥 AI Reel Auto Selling App</header>
 
-<select id="type">
-<option value="product">🛒 Product Selling</option>
-<option value="motivation">💪 Motivation</option>
-<option value="offer">⚡ Offer</option>
-<option value="story">📖 Story</option>
-<option value="festival">🎉 Festival</option>
-<option value="custom">✍️ Custom</option>
-</select>
+<div class="container">
 
-<input id="product" placeholder="Product / Topic">
-<input id="price" placeholder="Price / Detail">
-<input id="image" placeholder="Image URL">
-<input id="phone" placeholder="WhatsApp Number">
+  <div class="card">
+    <h3>🛍 Product Details</h3>
+    <input id="product" placeholder="Product Name">
+    <input id="price" placeholder="Price ₹">
+    <input id="phone" placeholder="WhatsApp Number (91xxxxxxxxxx)">
+  </div>
 
-<button onclick="generate()">🎬 Generate</button>
-<button onclick="play()">▶ Preview</button>
-<button onclick="record()">🎥 Record</button>
-<button onclick="download()">⬇ Download</button>
-<button onclick="voice()">🎤 Voice</button>
-<button onclick="share()">📲 WhatsApp Sell</button>
+  <div class="card">
+    <h3>🚀 Actions</h3>
+    <button class="generate" onclick="generate()">⚡ Generate Script</button>
+    <button class="preview" onclick="play()">🎬 Preview</button>
+    <button class="sell" onclick="autoSell()">💰 AUTO SELL</button>
+    <button class="voice" onclick="voice()">🎤 Voice</button>
+  </div>
 
-<textarea id="script" rows="6"></textarea>
+  <div class="card">
+    <h3>🧠 Script</h3>
+    <textarea id="script" rows="6"></textarea>
+  </div>
 
-<canvas id="canvas" width="720" height="1280"></canvas>
+  <div class="card">
+    <h3>🎥 Preview</h3>
+    <canvas id="canvas" width="720" height="1280"></canvas>
+  </div>
+
+</div>
 
 <script>
+
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-let scenes=[], index=0, alpha=0;
-let img = new Image();
-let bgm = new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
+let scenes = [];
+let index = 0;
 
-// 🎬 SCRIPT AI
+// 🔥 GENERATE SCRIPT
 function generate(){
 
-  let t = type.value;
-  let p = product.value;
-  let pr = price.value;
+  let product = document.getElementById("product").value;
+  let price = document.getElementById("price").value;
+  let phone = document.getElementById("phone").value;
 
-  if(t=="product"){
-    scenes = [
-      "🔥 आज का सबसे वायरल प्रोडक्ट!",
-      p + " जिसे लोग बार-बार खरीद रहे हैं 😍",
-      "सिर्फ ₹" + pr + " में शानदार ऑफर 💥",
-      "जल्दी करें स्टॉक खत्म हो रहा है ⚠️",
-      "अभी WhatsApp करें 👉 " + phone.value
-    ];
+  if(!product || !price || !phone){
+    alert("Sab details bharo!");
+    return;
   }
 
-  else if(t=="motivation"){
-    scenes = [
-      "💪 जिंदगी बदलनी है?",
-      "तो अभी मेहनत शुरू करो 🔥",
-      "कोई साथ दे या ना दे ❌",
-      "तुम खुद को आगे बढ़ाओ 🚀",
-      "आज से शुरू करो!"
-    ];
-  }
+  scenes = [
+    "🔥 Trending Product!",
+    product,
+    "Only ₹" + price,
+    "Limited Stock ⚠️",
+    "Order Now 📲 " + phone
+  ];
 
-  else if(t=="offer"){
-    scenes = [
-      "⚡ धमाकेदार ऑफर!",
-      p + " पर भारी छूट 💥",
-      "सिर्फ ₹" + pr,
-      "आज आखिरी मौका 😱",
-      "Order Now 👉 " + phone.value
-    ];
-  }
-
-  else if(t=="story"){
-    scenes = [
-      "एक लड़का था...",
-      "सब उसे कमजोर समझते थे 😢",
-      "लेकिन उसने हार नहीं मानी 💪",
-      "आज वही सबसे आगे है 🔥",
-      "आप भी कर सकते हैं!"
-    ];
-  }
-
-  else if(t=="festival"){
-    scenes = [
-      "🎉 त्योहार स्पेशल ऑफर!",
-      p + " आपके परिवार के लिए 🎁",
-      "खास कीमत ₹" + pr,
-      "खुशियां बांटे ❤️",
-      "अभी खरीदें!"
-    ];
-  }
-
-  else{
-    scenes = script.value.split("\n");
-  }
-
-  script.value = scenes.join("\n");
-  img.src = image.value;
+  document.getElementById("script").value = scenes.join("\n");
 }
 
-// ▶ PLAY
+// 🎬 PREVIEW
 function play(){
-  index=0;
-  bgm.play();
+
+  if(scenes.length === 0){
+    alert("Pehle script generate karo!");
+    return;
+  }
+
+  index = 0;
   next();
 }
 
 function next(){
-  if(index>=scenes.length) return;
-  alpha=0;
-  animate(scenes[index]);
+  if(index >= scenes.length) return;
+  draw(scenes[index]);
   index++;
-  setTimeout(next,2500);
-}
-
-// 🎥 ANIMATION
-function animate(text){
-  draw(text);
-  if(alpha<1){
-    alpha+=0.05;
-    requestAnimationFrame(()=>animate(text));
-  }
+  setTimeout(next, 2000);
 }
 
 function draw(text){
@@ -175,85 +156,90 @@ function draw(text){
   g.addColorStop(0,"#000");
   g.addColorStop(1,"#1e293b");
 
-  ctx.fillStyle=g;
+  ctx.fillStyle = g;
   ctx.fillRect(0,0,720,1280);
 
-  ctx.globalAlpha = alpha;
+  ctx.fillStyle = "#fff";
+  ctx.font = "bold 40px Arial";
 
-  if(img.src){
-    ctx.drawImage(img,110,150,500,350);
-  }
-
-  ctx.fillStyle="#fff";
-  ctx.font="bold 50px Arial";
-
-  wrap(text,60,650,600,60);
-
-  ctx.globalAlpha = 1;
+  wrapText(text, 50, 600, 620, 50);
 }
 
-// ✍️ WRAP
-function wrap(t,x,y,m,l){
-  let w=t.split(" "), line="";
-  for(let i=0;i<w.length;i++){
-    let test=line+w[i]+" ";
-    if(ctx.measureText(test).width>m){
-      ctx.fillText(line,x,y);
-      line=w[i]+" ";
-      y+=l;
-    } else line=test;
+function wrapText(text, x, y, maxWidth, lineHeight){
+  let words = text.split(" ");
+  let line = "";
+
+  for(let n = 0; n < words.length; n++){
+    let testLine = line + words[n] + " ";
+    let testWidth = ctx.measureText(testLine).width;
+
+    if(testWidth > maxWidth){
+      ctx.fillText(line, x, y);
+      line = words[n] + " ";
+      y += lineHeight;
+    } else {
+      line = testLine;
+    }
   }
-  ctx.fillText(line,x,y);
+  ctx.fillText(line, x, y);
 }
 
 // 🎤 VOICE
 function voice(){
+  if(scenes.length === 0){
+    alert("Script generate karo!");
+    return;
+  }
+
   let msg = new SpeechSynthesisUtterance(scenes.join(" "));
   msg.lang = "hi-IN";
   speechSynthesis.speak(msg);
 }
 
-// 🎥 RECORD
-let rec, chunks=[], videoURL;
+// 💰 AUTO SELL
+async function autoSell(){
 
-function record(){
-  let stream = canvas.captureStream(30);
-  rec = new MediaRecorder(stream);
-  chunks=[];
+  let product = document.getElementById("product").value;
+  let price = document.getElementById("price").value;
+  let phone = document.getElementById("phone").value;
 
-  rec.ondataavailable=e=>chunks.push(e.data);
-
-  rec.onstop=()=>{
-    let blob=new Blob(chunks,{type:"video/webm"});
-    videoURL=URL.createObjectURL(blob);
-    alert("वीडियो तैयार!");
-  };
-
-  rec.start();
-  play();
-
-  setTimeout(()=>rec.stop(), scenes.length*2500);
-}
-
-// ⬇ DOWNLOAD
-function download(){
-  if(!videoURL){
-    alert("पहले रिकॉर्ड करें");
+  if(!product || !price || !phone){
+    alert("Sab details bharna zaroori hai");
     return;
   }
-  let a=document.createElement("a");
-  a.href=videoURL;
-  a.download="reel.mp4";
-  a.click();
+
+  try{
+
+    let res = await fetch("http://localhost:3000/auto-reel",{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ topic: product })
+    });
+
+    let data = await res.json();
+
+    if(!data.video){
+      alert("Video generate nahi hua");
+      return;
+    }
+
+    let waLink = `https://wa.me/${phone}?text=${encodeURIComponent("Hi I want to buy " + product)}`;
+
+    let caption = `
+🔥 ${product}
+💰 ₹${price}
+📲 ${waLink}
+`;
+
+    window.open(data.video, "_blank");
+    window.open("https://wa.me/?text=" + encodeURIComponent(caption), "_blank");
+
+  } catch(err){
+    alert("Server error! Backend check karo");
+    console.log(err);
+  }
 }
 
-// 📲 WHATSAPP SELL
-function share(){
-  let caption = script.value + 
-  "\n🔥 Best Deal\n#viral #offer #shopping";
-
-  window.open("https://wa.me/?text="+encodeURIComponent(caption));
-}
 </script>
 
 </body>
